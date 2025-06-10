@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cainta Road Clearing Requests</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1, h2 { color: #0056b3; }
+        .btn {
+            display: inline-block;
+            padding: 10px 15px;
+            margin: 5px 0;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .btn:hover { background-color: #0056b3; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+        .status-pending { color: orange; font-weight: bold; }
+        .status-inprogress { color: blue; font-weight: bold; }
+        .status-completed { color: green; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Cainta Road Clearing Request System</h1>
+
+        <a href="{{ url_for('add_request') }}" class="btn">Add New Request</a>
+
+        <h2>All Requests</h2>
+        {% if requests %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>Reporter Name</th>
+                    <th>Barangay</th>
+                    <th>Street Address</th>
+                    <th>Status</th>
+                    <th>Reported At</th>
+                    <th>Last Updated</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for req in requests %}
+                <tr>
+                    <td>{{ req.request_id }}</td>
+                    <td>{{ req.reporter_name }}</td>
+                    <td>{{ req.barangay }}</td>
+                    <td>{{ req.street_address }}</td>
+                    <td class="status-{{ req.status.lower().replace(' ', '-') }}">{{ req.status }}</td>
+                    <td>{{ req.reported_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                    <td>{{ req.last_updated.strftime('%Y-%m-%d %H:%M') }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No road clearing requests found yet. Add one!</p>
+        {% endif %}
+    </div>
+</body>
+</html>

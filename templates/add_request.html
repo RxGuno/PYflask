@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Request</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+        h1 { color: #0056b3; }
+        form div { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"], input[type="tel"], textarea, select {
+            width: calc(100% - 22px); /* Adjust for padding and border */
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        textarea { resize: vertical; min-height: 80px; }
+        button {
+            background-color: #28a745;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover { background-color: #218838; }
+        .back-link { display: block; margin-top: 20px; text-align: center; color: #007bff; text-decoration: none; }
+        .back-link:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Add New Road Clearing Request</h1>
+        <form method="POST">
+            <div>
+                <label for="reporter_name">Reporter Name:</label>
+                <input type="text" id="reporter_name" name="reporter_name" required>
+            </div>
+            <div>
+                <label for="contact_number">Contact Number (Optional):</label>
+                <input type="tel" id="contact_number" name="contact_number">
+            </div>
+            <div>
+                <label for="barangay">Barangay:</label>
+                <input type="text" id="barangay" name="barangay" required>
+            </div>
+            <div>
+                <label for="street_address">Street Address / Landmark:</label>
+                <input type="text" id="street_address" name="street_address" required>
+            </div>
+            <div>
+                <label for="description">Description of Obstruction (Optional):</label>
+                <textarea id="description" name="description"></textarea>
+            </div>
+            <div>
+                <label for="status">Initial Status:</label>
+                <select id="status" name="status">
+                    <option value="Pending">Pending</option>
+                    <option value="In Progress">In Progress</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Rejected">Rejected</option>
+                </select>
+            </div>
+            <button type="submit">Submit Request</button>
+        </form>
+        <a href="{{ url_for('index') }}" class="back-link">Back to All Requests</a>
+    </div>
+</body>
+</html>
