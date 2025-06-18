@@ -4,10 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cainta Road Clearing Requests</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
-        .container { max-width: 900px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h1, h2 { color: #0056b3; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1, h2 {
+            color: #0056b3;
+        }
         .btn {
             display: inline-block;
             padding: 10px 15px;
@@ -18,19 +33,56 @@
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
-        .btn:hover { background-color: #0056b3; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-        th { background-color: #f2f2f2; }
-        tr:nth-child(even) { background-color: #f9f9f9; }
-        .status-pending { color: orange; font-weight: bold; }
-        .status-inprogress { color: blue; font-weight: bold; }
-        .status-completed { color: green; font-weight: bold; }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .status-pending {
+            color: orange;
+            font-weight: bold;
+        }
+        .status-in-progress {
+            color: blue;
+            font-weight: bold;
+        }
+        .status-completed {
+            color: green;
+            font-weight: bold;
+        }
+        .status-rejected {
+            color: red;
+            font-weight: bold;
+        }
+        #map {
+            height: 400px;
+            margin-top: 20px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>Cainta Road Clearing Request System</h1>
+
+        <!-- 🌍 Map Section -->
+        <h2>Map of Requests in Cainta, Rizal</h2>
+        <div id="map"></div>
 
         <a href="{{ url_for('add_request') }}" class="btn">Add New Request</a>
 
@@ -66,5 +118,43 @@
         <p>No road clearing requests found yet. Add one!</p>
         {% endif %}
     </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const center = [14.5764, 121.1232];  // Cainta center coordinates
+
+        const bounds = L.latLngBounds(
+            [14.54, 121.08], // SW
+            [14.61, 121.17]  // NE
+        );
+
+        const map = L.map('map', {
+            center: center,
+            zoom: 14,
+            minZoom: 13,
+            maxZoom: 16,
+            maxBounds: bounds,
+            maxBoundsViscosity: 1.0
+        });
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
+            attribution: '&copy; OpenStreetMap contributors'
+        }).addTo(map);
+
+        {% for req in requests %}
+            {% if req.latitude and req.longitude %}
+                L.circleMarker([{{ req.latitude }}, {{ req.longitude }}], {
+                    radius: 6,
+                    fillColor: "red",
+                    color: "#900",
+                    weight: 1,
+                    opacity: 1,
+                    fillOpacity: 0.8
+                }).addTo(map).bindPopup(`<b>{{ req.reporter_name }}</b><br>{{ req.street_address }}<br>Status: {{ req.status }}`);
+            {% endif %}
+        {% endfor %}
+    </script>
 </body>
 </html>

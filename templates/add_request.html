@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add New Request</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
     <style>
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
         .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
@@ -11,11 +12,11 @@
         form div { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input[type="text"], input[type="tel"], textarea, select {
-            width: calc(100% - 22px); /* Adjust for padding and border */
+            width: calc(100% - 22px);
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            box-sizing: border-box;
         }
         textarea { resize: vertical; min-height: 80px; }
         button {
@@ -31,6 +32,13 @@
         button:hover { background-color: #218838; }
         .back-link { display: block; margin-top: 20px; text-align: center; color: #007bff; text-decoration: none; }
         .back-link:hover { text-decoration: underline; }
+
+        #map {
+            height: 300px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -66,9 +74,55 @@
                     <option value="Rejected">Rejected</option>
                 </select>
             </div>
+
+            <!-- 🌍 Location Map -->
+            <div>
+                <label>Pin Your Location (Optional):</label>
+                <div id="map"></div>
+                <button type="button" onclick="getCurrentLocation()">📍 Use Current Location</button>
+                <input type="hidden" name="latitude" id="latitude">
+                <input type="hidden" name="longitude" id="longitude">
+            </div>
+
             <button type="submit">Submit Request</button>
         </form>
         <a href="{{ url_for('index') }}" class="back-link">Back to All Requests</a>
     </div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([14.5764, 121.1232], 14);  // Cainta center
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: 'Map data © OpenStreetMap contributors'
+        }).addTo(map);
+
+        let marker;
+
+        function setMarker(lat, lng) {
+            if (marker) map.removeLayer(marker);
+            marker = L.marker([lat, lng]).addTo(map);
+            document.getElementById('latitude').value = lat;
+            document.getElementById('longitude').value = lng;
+        }
+
+        map.on('click', function(e) {
+            setMarker(e.latlng.lat, e.latlng.lng);
+        });
+
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    setMarker(lat, lng);
+                    map.setView([lat, lng], 15);
+                }, function() {
+                    alert("Location access denied.");
+                });
+            } else {
+                alert("Geolocation is not supported by this browser.");
+            }
+        }
+    </script>
 </body>
 </html>
