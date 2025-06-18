@@ -1,128 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Request</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
-        .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
-        h1 { color: #0056b3; }
-        form div { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], input[type="tel"], textarea, select {
-            width: calc(100% - 22px);
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        textarea { resize: vertical; min-height: 80px; }
-        button {
-            background-color: #28a745;
-            color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background-color 0.3s ease;
-        }
-        button:hover { background-color: #218838; }
-        .back-link { display: block; margin-top: 20px; text-align: center; color: #007bff; text-decoration: none; }
-        .back-link:hover { text-decoration: underline; }
-
-        #map {
-            height: 300px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            margin-bottom: 15px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Add New Request</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
+    .container { max-width: 600px; margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    h1 { color: #0056b3; }
+    form div { margin-bottom: 15px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input[type="text"], input[type="tel"], textarea, select {
+      width: calc(100% - 22px);
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+    button {
+      background-color: #28a745;
+      color: white;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+      transition: background-color 0.3s ease;
+    }
+    button:hover { background-color: #218838; }
+    .back-link { display: block; margin-top: 20px; text-align: center; color: #007bff; text-decoration: none; }
+    .back-link:hover { text-decoration: underline; }
+    .location-button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .location-button:hover {
+      background-color: #0056b3;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Add New Road Clearing Request</h1>
-        <form method="POST">
-            <div>
-                <label for="reporter_name">Reporter Name:</label>
-                <input type="text" id="reporter_name" name="reporter_name" required>
-            </div>
-            <div>
-                <label for="contact_number">Contact Number (Optional):</label>
-                <input type="tel" id="contact_number" name="contact_number">
-            </div>
-            <div>
-                <label for="barangay">Barangay:</label>
-                <input type="text" id="barangay" name="barangay" required>
-            </div>
-            <div>
-                <label for="street_address">Street Address / Landmark:</label>
-                <input type="text" id="street_address" name="street_address" required>
-            </div>
-            <div>
-                <label for="description">Description of Obstruction (Optional):</label>
-                <textarea id="description" name="description"></textarea>
-            </div>
-            <div>
-                <label for="status">Initial Status:</label>
-                <select id="status" name="status">
-                    <option value="Pending">Pending</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Rejected">Rejected</option>
-                </select>
-            </div>
+  <div class="container">
+    <h1>Add New Road Clearing Request</h1>
+    <form method="POST">
+      <div>
+        <label for="reporter_name">Reporter Name:</label>
+        <input type="text" id="reporter_name" name="reporter_name" required>
+      </div>
+      <div>
+        <label for="contact_number">Contact Number (Optional):</label>
+        <input type="tel" id="contact_number" name="contact_number">
+      </div>
+      <div>
+        <label for="barangay">Barangay:</label>
+        <input type="text" id="barangay" name="barangay" required>
+      </div>
+      <div>
+        <label for="street_address">Street Address / Landmark:</label>
+        <input type="text" id="street_address" name="street_address" required>
+        <button type="button" id="use-location" class="location-button">Use Current Location</button>
+      </div>
+      <div>
+        <label for="description">Description of Obstruction (Optional):</label>
+        <textarea id="description" name="description"></textarea>
+      </div>
+      <div>
+        <label for="status">Initial Status:</label>
+        <select id="status" name="status">
+          <option value="Pending">Pending</option>
+          <option value="In Progress">In Progress</option>
+          <option value="Completed">Completed</option>
+          <option value="Rejected">Rejected</option>
+        </select>
+      </div>
 
-            <!-- 🌍 Location Map -->
-            <div>
-                <label>Pin Your Location (Optional):</label>
-                <div id="map"></div>
-                <button type="button" onclick="getCurrentLocation()">📍 Use Current Location</button>
-                <input type="hidden" name="latitude" id="latitude">
-                <input type="hidden" name="longitude" id="longitude">
-            </div>
+      <!-- Hidden fields to store lat/lon -->
+      <input type="hidden" id="latitude" name="latitude">
+      <input type="hidden" id="longitude" name="longitude">
 
-            <button type="submit">Submit Request</button>
-        </form>
-        <a href="{{ url_for('index') }}" class="back-link">Back to All Requests</a>
-    </div>
+      <button type="submit">Submit Request</button>
+    </form>
+    <a href="{{ url_for('index') }}" class="back-link">Back to All Requests</a>
+  </div>
 
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-    <script>
-        const map = L.map('map').setView([14.5764, 121.1232], 14);  // Cainta center
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data © OpenStreetMap contributors'
-        }).addTo(map);
+  <script>
+    document.getElementById('use-location').addEventListener('click', function () {
+      if (!navigator.geolocation) {
+        alert("Geolocation is not supported by your browser.");
+        return;
+      }
 
-        let marker;
+      navigator.geolocation.getCurrentPosition(success, error);
 
-        function setMarker(lat, lng) {
-            if (marker) map.removeLayer(marker);
-            marker = L.marker([lat, lng]).addTo(map);
-            document.getElementById('latitude').value = lat;
-            document.getElementById('longitude').value = lng;
-        }
+      function success(position) {
+        const lat = position.coords.latitude;
+        const lon = position.coords.longitude;
 
-        map.on('click', function(e) {
-            setMarker(e.latlng.lat, e.latlng.lng);
-        });
+        // Store lat/lon in hidden fields
+        document.getElementById('latitude').value = lat;
+        document.getElementById('longitude').value = lon;
 
-        function getCurrentLocation() {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    const lat = position.coords.latitude;
-                    const lng = position.coords.longitude;
-                    setMarker(lat, lng);
-                    map.setView([lat, lng], 15);
-                }, function() {
-                    alert("Location access denied.");
-                });
+        fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.address) {
+              if (data.display_name) {
+                document.getElementById('street_address').value = data.display_name;
+              }
+              if (data.address.barangay) {
+                document.getElementById('barangay').value = data.address.barangay;
+              } else if (data.address.village) {
+                document.getElementById('barangay').value = data.address.village;
+              } else if (data.address.suburb) {
+                document.getElementById('barangay').value = data.address.suburb;
+              }
             } else {
-                alert("Geolocation is not supported by this browser.");
+              alert("Could not retrieve address from your location.");
             }
-        }
-    </script>
+          })
+          .catch(() => alert("Error retrieving address from coordinates."));
+      }
+
+      function error() {
+        alert("Unable to retrieve your current location.");
+      }
+    });
+  </script>
 </body>
 </html>

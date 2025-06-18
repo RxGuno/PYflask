@@ -54,6 +54,29 @@ def geocode_address(address):
         print(f"Geocoding error: {e}")
     return None, None
 
+# Reverse geocoding
+def reverse_geocode(lat, lon):
+    try:
+        url = 'https://nominatim.openstreetmap.org/reverse'
+        params = {
+            'lat': lat,
+            'lon': lon,
+            'format': 'json'
+        }
+        headers = {
+            'User-Agent': 'Cainta-RoadClearing-System'
+        }
+        response = requests.get(url, params=params, headers=headers)
+        data = response.json()
+        if 'address' in data:
+            address = data['address']
+            street = address.get('road', '') or address.get('pedestrian', '') or ''
+            barangay = address.get('suburb', '') or address.get('neighbourhood', '') or ''
+            return street, barangay
+    except Exception as e:
+        print(f"Reverse geocoding error: {e}")
+    return '', ''
+
 # Routes
 @app.route('/')
 def index():
@@ -69,14 +92,27 @@ def add_request():
         street_address = request.form['street_address']
         description = request.form.get('description')
         status = request.form.get('status', 'Pending')
+        latitude = request.form.get('latitude')
+        longitude = request.form.get('longitude')
 
+        # Convert latitude/longitude if available
+        lat = float(latitude) if latitude else None
+        lon = float(longitude) if longitude else None
+
+        # If address not manually filled, try reverse geocode
+        if lat and lon and (not street_address or not barangay):
+            street, brgy = reverse_geocode(lat, lon)
+            street_address = street_address or street
+            barangay = barangay or brgy
+
+        # If lat/lon still not available, fallback to geocoding
+        if not lat or not lon:
+            full_address = f"{street_address}, {barangay}, Cainta, Rizal, Philippines"
+            lat, lon = geocode_address(full_address)
+
+        # Generate request ID
         timestamp_str = datetime.now().strftime('%Y%m%d%H%M%S')
         request_id = f"RC-{timestamp_str}-{random.randint(1000, 9999)}"
-
-        # Generate full address
-        full_address = f"{street_address}, {barangay}, Cainta, Rizal, Philippines"
-        lat, lon = geocode_address(full_address)
-        print(f"Geocoding: {full_address} → {lat}, {lon}")
 
         new_request = RoadClearingRequest(
             request_id=request_id,
